@@ -11,9 +11,11 @@ La aplicación se despliega automáticamente en GitHub Pages cuando se actualiza
 ### Configuración para GitHub Pages
 
 1. Ve a **Settings** > **Pages** en tu repositorio
-2. En **Source**, selecciona **GitHub Actions**
+2. En **Source**, selecciona **Deploy from a branch** y luego **GitHub Actions**
 3. El workflow se ejecutará automáticamente en cada push a `main`
 4. La aplicación estará disponible en: `https://[tu-usuario].github.io/github-issues/`
+
+**Nota importante:** La aplicación está configurada para exportar a la carpeta `/docs` para compatibilidad con GitHub Pages.
 
 ## Características
 
