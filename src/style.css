@@ -1,0 +1,360 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #24292e;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.app-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #f0f6fc;
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.auth-section {
+  background: #2d333b;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.token-input {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 1rem 0;
+  border: 1px solid #444c56;
+  border-radius: 4px;
+  background: #22272e;
+  color: white;
+  font-size: 1rem;
+}
+
+.btn {
+  background: #238636;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin: 0.5rem;
+}
+
+.btn:hover {
+  background: #2ea043;
+}
+
+.btn-secondary {
+  background: #6e7681;
+}
+
+.btn-secondary:hover {
+  background: #8b949e;
+}
+
+.issues-list {
+  text-align: left;
+}
+
+.issue-item {
+  background: #2d333b;
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 6px;
+  border-left: 4px solid #f78166;
+}
+
+.issue-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.issue-link {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.issue-link:hover {
+  text-decoration: underline;
+}
+
+.issue-header {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-right: 2rem;
+}
+
+.issue-header:hover {
+  opacity: 0.8;
+}
+
+.expand-icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 0.8rem;
+  color: #8b949e;
+}
+
+.issue-meta {
+  color: #8b949e;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.issue-labels {
+  display: inline-flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.label {
+  padding: 0.1rem 0.4rem;
+  border-radius: 2em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+.issue-content {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #444c56;
+}
+
+.issue-body {
+  background: #22272e;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.issue-body code {
+  background: #2d333b;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.85em;
+}
+
+.issue-body a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.issue-body a:hover {
+  text-decoration: underline;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #8b949e;
+}
+
+.error {
+  background: #da3633;
+  color: white;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+.filters-section {
+  background: #2d333b;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.filter-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  position: absolute;
+  background: #22272e;
+  border: 1px solid #444c56;
+  border-radius: 6px;
+  padding: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  min-width: 250px;
+  right: 0;
+  margin-top: 0.5rem;
+}
+
+.dropdown-item {
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.dropdown-item:hover {
+  background: #2d333b;
+}
+
+.dropdown-item label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  margin: 0;
+}
+
+.selected-repos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.repo-pill {
+  background: #58a6ff;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 2em;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pill-remove {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pill-remove:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.btn-small {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.repo-section {
+  margin-bottom: 2rem;
+  border: 1px solid #444c56;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.repo-header {
+  background: #2d333b;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #444c56;
+}
+
+.repo-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #58a6ff;
+}
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  .auth-section,
+  .issue-item {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+  }
+  .token-input {
+    background: white;
+    color: #1f2328;
+    border-color: #d0d7de;
+  }
+  .issue-meta {
+    color: #656d76;
+  }
+  .filters-section {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+  }
+  .dropdown-content {
+    background: white;
+    border-color: #d0d7de;
+  }
+  .dropdown-item:hover {
+    background: #f6f8fa;
+  }
+  .repo-section {
+    border-color: #d0d7de;
+  }
+  .repo-header {
+    background: #f6f8fa;
+    border-color: #d0d7de;
+  }
+  .repo-header h3 {
+    color: #0969da;
+  }
+}
