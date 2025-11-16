@@ -2,6 +2,8 @@
 
 Una Progressive Web App (PWA) construida con Vue 3, TypeScript y Vite que permite listar todos los issues abiertos de tus repositorios de GitHub.
 
+**🌐 Demo en vivo:** [https://seyacat.github.io/github-issues/](https://seyacat.github.io/github-issues/)
+
 ## 🚀 Despliegue en GitHub Pages
 
 La aplicación se despliega automáticamente en GitHub Pages cuando se actualiza la rama `main`. El workflow está configurado en [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
