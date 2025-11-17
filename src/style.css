@@ -407,6 +407,22 @@ body {
   color: #58a6ff;
 }
 
+.repo-section-category {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #444c56;
+}
+
+.repo-section-category:last-child {
+  border-bottom: none;
+}
+
+.repo-section-category h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #8b949e;
+  font-weight: 600;
+}
+
 
 @media (prefers-color-scheme: light) {
   :root {

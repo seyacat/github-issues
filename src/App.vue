@@ -69,15 +69,19 @@
         Cargando issues...
       </div>
 
-      <div v-else-if="filteredIssues.length > 0" class="issues-list">
-        <!-- Issues Cerradas con PRs Abiertos -->
-        <div v-if="closedIssuesWithOpenPRs.length > 0">
-          <h2>Issues Cerradas con PRs Abiertos ({{ closedIssuesWithOpenPRs.length }})</h2>
-          <div v-for="repo in groupedClosedIssuesWithPRs" :key="repo.name" class="repo-section">
-            <div class="repo-header">
-              <h3>{{ repo.name }}</h3>
-            </div>
-            <div v-for="issue in repo.issues" :key="issue.id" class="issue-item">
+      <div v-else-if="filteredIssues.length > 0 || pullRequestsWithoutIssues.length > 0" class="issues-list">
+        <div v-for="repoName in selectedRepos" :key="repoName" class="repo-section">
+          <div class="repo-header">
+            <h3>{{ repoName }}</h3>
+            <button @click="createIssue(repoName)" class="btn btn-small">
+              Crear Issue
+            </button>
+          </div>
+          
+          <!-- Issues Cerradas con PRs Abiertos -->
+          <div v-if="getClosedIssuesWithPRsForRepo(repoName).length > 0" class="repo-section-category">
+            <h4>Issues Cerradas con PRs Abiertos ({{ getClosedIssuesWithPRsForRepo(repoName).length }})</h4>
+            <div v-for="issue in getClosedIssuesWithPRsForRepo(repoName)" :key="issue.id" class="issue-item">
               <div class="issue-header" @click="toggleIssue(issue.id)">
                 <div class="issue-main">
                   <div class="issue-title">
@@ -128,19 +132,11 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Issues Abiertas -->
-        <div v-if="openIssues.length > 0">
-          <h2>Issues Abiertas ({{ openIssues.length }})</h2>
-          <div v-for="repo in groupedOpenIssues" :key="repo.name" class="repo-section">
-            <div class="repo-header">
-              <h3>{{ repo.name }}</h3>
-              <button @click="createIssue(repo.name)" class="btn btn-small">
-                Crear Issue
-              </button>
-            </div>
-            <div v-for="issue in repo.issues" :key="issue.id" class="issue-item">
+          <!-- Issues Abiertas -->
+          <div v-if="getOpenIssuesForRepo(repoName).length > 0" class="repo-section-category">
+            <h4>Issues Abiertas ({{ getOpenIssuesForRepo(repoName).length }})</h4>
+            <div v-for="issue in getOpenIssuesForRepo(repoName)" :key="issue.id" class="issue-item">
               <div class="issue-header" @click="toggleIssue(issue.id)">
                 <div class="issue-main">
                   <div class="issue-title">
@@ -191,16 +187,11 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- PRs sin Issues -->
-        <div v-if="pullRequestsWithoutIssues.length > 0">
-          <h2>PRs sin Issues Vinculadas ({{ pullRequestsWithoutIssues.length }})</h2>
-          <div v-for="repo in groupedPRsWithoutIssues" :key="repo.name" class="repo-section">
-            <div class="repo-header">
-              <h3>{{ repo.name }}</h3>
-            </div>
-            <div v-for="pr in repo.prs" :key="pr.id" class="issue-item">
+          <!-- PRs sin Issues -->
+          <div v-if="getPRsWithoutIssuesForRepo(repoName).length > 0" class="repo-section-category">
+            <h4>PRs sin Issues Vinculadas ({{ getPRsWithoutIssuesForRepo(repoName).length }})</h4>
+            <div v-for="pr in getPRsWithoutIssuesForRepo(repoName)" :key="pr.id" class="issue-item">
               <div class="issue-header">
                 <div class="issue-main">
                   <div class="issue-title">
@@ -467,6 +458,18 @@ const groupedPRsWithoutIssues = computed(() => {
   
   return Object.values(groups).sort((a, b) => a.name.localeCompare(b.name))
 })
+
+const getClosedIssuesWithPRsForRepo = (repoName: string) => {
+  return closedIssuesWithOpenPRs.value.filter(issue => issue.repository === repoName)
+}
+
+const getOpenIssuesForRepo = (repoName: string) => {
+  return openIssues.value.filter(issue => issue.repository === repoName)
+}
+
+const getPRsWithoutIssuesForRepo = (repoName: string) => {
+  return pullRequestsWithoutIssues.value.filter(pr => pr.repository === repoName)
+}
 
 const groupedIssues = computed(() => {
   const groups: { [key: string]: { name: string; issues: Issue[] } } = {}
