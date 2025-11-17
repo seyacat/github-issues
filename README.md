@@ -1,99 +1,67 @@
 # GitHub Issues PWA
 
-Una Progressive Web App (PWA) construida con Vue 3, TypeScript y Vite que permite listar todos los issues abiertos de tus repositorios de GitHub.
+![Splash](splash.png)
 
-**🌐 Demo en vivo:** [https://seyacat.github.io/github-issues/](https://seyacat.github.io/github-issues/)
+A Progressive Web App (PWA) built with Vue 3 that helps you manage GitHub issues and pull requests across your repositories.
 
-## 🚀 Despliegue en GitHub Pages
+**🌐 Live Demo:** [https://seyacat.github.io/github-issues/](https://seyacat.github.io/github-issues/)
 
-La aplicación se despliega automáticamente en GitHub Pages cuando se actualiza la rama `main`. El workflow está configurado en [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+## Key Features
 
-### Configuración para GitHub Pages
+- **Complete Issue Management**: View open issues and closed issues with active pull requests
+- **Linked Pull Requests**: Automatic detection of related pull requests for each issue
+- **Repository Selection**: Filter by specific repositories using dropdown selection
+- **Branch Tracking**: Shows branches linked to issues (issue-{number}-* naming convention)
+- **PWA Support**: Installable and works offline
+- **Secure Authentication**: GitHub token stored locally in browser
+- **Responsive Design**: Works on desktop and mobile devices
 
-1. Ve a **Settings** > **Pages** en tu repositorio
-2. En **Source**, selecciona **Deploy from a branch** y luego **GitHub Actions**
-3. El workflow se ejecutará automáticamente en cada push a `main`
-4. La aplicación estará disponible en: `https://[tu-usuario].github.io/github-issues/`
+## Usage from GitHub Pages
 
-**Nota importante:** La aplicación está configurada para exportar a la carpeta `/docs` para compatibilidad con GitHub Pages.
+The app is available directly from GitHub Pages:
 
-## Características
+1. **Access the app**: [https://seyacat.github.io/github-issues/](https://seyacat.github.io/github-issues/)
+2. **Connect with GitHub**: Enter your personal access token
+3. **Select repositories**: Choose which repositories to monitor from the dropdown
+4. **Load issues**: View all issues and their related pull requests and branches
 
-- **PWA**: Instalable y funciona offline
-- **Autenticación**: Conexión con GitHub usando tokens de acceso personal
-- **Almacenamiento**: Token guardado en localStorage
-- **Lista de Issues**: Muestra todos los issues abiertos de todos los repositorios públicos
-- **Hipervínculos**: Enlaces directos a los issues en GitHub
-- **Responsive**: Diseño adaptable a diferentes dispositivos
+### Token Setup
 
-## Requisitos
+1. Go to [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
+2. Generate a token with permissions: `repo` and `read:org`
+3. Use it in the app to access all your repositories (public, private, and organization repos)
 
-- Node.js 16 o superior
-- Un token de acceso personal de GitHub
+## How It Works
 
-## Instalación
+The app connects to GitHub's API to fetch:
 
-1. Instalar dependencias:
-```bash
-npm install
-```
+- **All repositories** you have access to (including organizations and collaborations)
+- **Open and closed issues** with linked pull requests
+- **Pull requests without linked issues**
+- **Branches** following issue naming conventions
 
-2. Ejecutar en modo desarrollo:
-```bash
-npm run dev
-```
+### Issue Categories
 
-3. Construir para producción:
-```bash
-npm run build
-```
+- **Closed Issues with Open PRs**: Issues that are closed but have active pull requests
+- **Open Issues**: Currently open issues with their details
+- **PRs without Linked Issues**: Pull requests that don't reference any issue
 
-## Configuración
+## Technologies
 
-1. Ve a [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens)
-2. Genera un nuevo token con los siguientes permisos:
-   - `repo` (acceso completo a repositorios)
-   - `read:org` (lectura de organizaciones)
-3. **Para repositorios privados y de colaboración** asegúrate de que el token tenga permisos de repositorio
-4. Copia el token y pégarlo en la aplicación
-
-**Nota sobre repositorios privados:**
-- La aplicación ahora muestra **todos los repositorios** a los que tienes acceso
-- Incluye repositorios propios (públicos y privados)
-- Incluye repositorios de organizaciones donde eres miembro
-- Incluye repositorios donde eres colaborador
-
-## Uso
-
-1. Abre la aplicación en tu navegador
-2. Ingresa tu token de GitHub
-3. Haz clic en "Cargar Issues"
-4. La aplicación mostrará todos los issues abiertos de tus repositorios
-5. Haz clic en cualquier issue para abrirlo en GitHub
-
-## Estructura del Proyecto
-
-```
-src/
-├── App.vue                 # Componente principal
-├── main.ts                 # Punto de entrada
-├── style.css              # Estilos globales
-├── vite-env.d.ts          # Definiciones de TypeScript
-└── services/
-    └── githubService.ts   # Servicio para API de GitHub
-```
-
-## Tecnologías
-
-- Vue 3 con Composition API
+- Vue 3 with Composition API
 - TypeScript
 - Vite
 - PWA (Vite Plugin PWA)
 - GitHub REST API
 
-## Notas
+## Development
 
-- La aplicación solo muestra issues de repositorios públicos
-- El token se almacena localmente en el navegador
-- Los datos se obtienen en tiempo real desde GitHub API
-- La aplicación es completamente cliente-side
+```bash
+npm install
+npm run dev
+npm run build
+```
+
+## Deployment
+
+The app automatically deploys to GitHub Pages via GitHub Actions when the `main` branch is updated. The build output goes to the `/docs` folder for GitHub Pages compatibility.
