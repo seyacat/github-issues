@@ -81,31 +81,47 @@
           </div>
           <div v-for="issue in repo.issues" :key="issue.id" class="issue-item">
             <div class="issue-header" @click="toggleIssue(issue.id)">
-              <div class="issue-title">
-                <a :href="issue.html_url" target="_blank" class="issue-link" @click.stop>
-                  {{ issue.title }}
-                </a>
-              </div>
-              <div class="issue-meta">
-                #{{ issue.number }} •
-                Creado: {{ formatDate(issue.created_at) }} •
-                Por: <a :href="issue.user.html_url" target="_blank" @click.stop>{{ issue.user.login }}</a>
-                <span v-if="issue.assignees.length > 0" class="assignees">
-                  • Asignado a:
-                  <span v-for="assignee in issue.assignees" :key="assignee.login" class="assignee">
-                    <a :href="assignee.html_url" target="_blank" @click.stop>{{ assignee.login }}</a>
+              <div class="issue-main">
+                <div class="issue-title">
+                  <a :href="issue.html_url" target="_blank" class="issue-link" @click.stop>
+                    {{ issue.title }}
+                  </a>
+                </div>
+                <div class="issue-meta">
+                  #{{ issue.number }} •
+                  Creado: {{ formatDate(issue.created_at) }} •
+                  Por: <a :href="issue.user.html_url" target="_blank" @click.stop>{{ issue.user.login }}</a>
+                  <span v-if="issue.assignees.length > 0" class="assignees">
+                    • Asignado a:
+                    <span v-for="assignee in issue.assignees" :key="assignee.login" class="assignee">
+                      <a :href="assignee.html_url" target="_blank" @click.stop>{{ assignee.login }}</a>
+                    </span>
                   </span>
-                </span>
-                <span v-if="issue.labels.length > 0" class="issue-labels">
-                  •
-                  <span v-for="label in issue.labels" :key="label.name" class="label"
-                        :style="{ backgroundColor: '#' + label.color, color: getLabelTextColor(label.color) }">
-                    {{ label.name }}
+                  <span v-if="issue.labels.length > 0" class="issue-labels">
+                    •
+                    <span v-for="label in issue.labels" :key="label.name" class="label"
+                          :style="{ backgroundColor: '#' + label.color, color: getLabelTextColor(label.color) }">
+                      {{ label.name }}
+                    </span>
                   </span>
-                </span>
+                </div>
               </div>
               <div class="expand-icon">
                 {{ expandedIssues[issue.id] ? '▼' : '▶' }}
+              </div>
+            </div>
+            <div v-if="(issue.linked_branches && issue.linked_branches.length > 0) || (issue.linked_pull_requests && issue.linked_pull_requests.length > 0)" class="issue-links">
+              <div v-if="issue.linked_branches && issue.linked_branches.length > 0" class="issue-branches">
+                <span class="branches-label">Ramas:</span>
+                <span v-for="branch in issue.linked_branches" :key="branch.name" class="branch">
+                  <a :href="branch.url" target="_blank" @click.stop>{{ branch.name }}</a>
+                </span>
+              </div>
+              <div v-if="issue.linked_pull_requests && issue.linked_pull_requests.length > 0" class="issue-pulls">
+                <span class="pulls-label">Pull Requests:</span>
+                <span v-for="pr in issue.linked_pull_requests" :key="pr.number" class="pull-request">
+                  <a :href="pr.html_url" target="_blank" @click.stop>#{{ pr.number }} ({{ pr.state }})</a>
+                </span>
               </div>
             </div>
             <div v-if="expandedIssues[issue.id]" class="issue-content">
@@ -122,6 +138,7 @@
         <p>Selecciona repositorios para ver los issues.</p>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -157,6 +174,16 @@ interface Issue {
     login: string
     html_url: string
     avatar_url: string
+  }>
+  linked_branches?: Array<{
+    name: string
+    url: string
+  }>
+  linked_pull_requests?: Array<{
+    number: number
+    title: string
+    html_url: string
+    state: string
   }>
 }
 
@@ -214,6 +241,7 @@ const loadIssues = async () => {
 
   try {
     const allIssues = await githubService.getAllOpenIssues(selectedRepos.value)
+    console.log('Loaded issues:', allIssues)
     issues.value = allIssues
     filteredIssues.value = allIssues
   } catch (err) {
@@ -312,6 +340,7 @@ const renderMarkdown = (text: string) => {
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('es-ES')
 }
+
 
 onMounted(async () => {
   if (githubService.hasToken()) {

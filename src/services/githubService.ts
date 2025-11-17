@@ -58,6 +58,16 @@ interface ProcessedIssue {
     html_url: string
     avatar_url: string
   }>
+  linked_branches?: Array<{
+    name: string
+    url: string
+  }>
+  linked_pull_requests?: Array<{
+    number: number
+    title: string
+    html_url: string
+    state: string
+  }>
 }
 
 class GitHubService {
@@ -146,7 +156,86 @@ class GitHubService {
         try {
           const issues = await this.getRepositoryIssues(repo.full_name)
           
-          issues.forEach((issue: GitHubIssue) => {
+          for (const issue of issues) {
+            // Obtener las ramas vinculadas al issue
+            let linkedBranches: Array<{ name: string; url: string }> = []
+            let linkedPullRequests: Array<{ number: number; title: string; html_url: string; state: string }> = []
+            
+            try {
+              // Buscar ramas que sigan el naming convention de GitHub
+              const branchesResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/branches`, {
+                headers: {
+                  'Authorization': `token ${this.token}`,
+                  'Accept': 'application/vnd.github.v3+json'
+                }
+              })
+              
+              if (branchesResponse.ok) {
+                const branches = await branchesResponse.json()
+                // Filtrar ramas que sigan el patrón issue-{number}
+                const issueBranches = branches.filter((branch: any) =>
+                  branch.name.startsWith(`issue-${issue.number}-`) ||
+                  branch.name.startsWith(`${issue.number}-`)
+                )
+                
+                linkedBranches = issueBranches.map((branch: any) => ({
+                  name: branch.name,
+                  url: `https://github.com/${repo.full_name}/tree/${branch.name}`
+                }))
+              }
+            } catch (branchError) {
+              console.error(`Error al obtener ramas para issue ${issue.number}:`, branchError)
+            }
+            
+            try {
+              // Buscar pull requests que referencien este issue
+              const pullsResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/pulls?state=all&per_page=100`, {
+                headers: {
+                  'Authorization': `token ${this.token}`,
+                  'Accept': 'application/vnd.github.v3+json'
+                }
+              })
+              
+              if (pullsResponse.ok) {
+                const pulls = await pullsResponse.json()
+                console.log(`Found ${pulls.length} PRs in ${repo.full_name} for issue #${issue.number}`)
+                
+                // Filtrar PRs que referencien este issue en el body o título
+                const issuePulls = pulls.filter((pull: any) => {
+                  const issueRef = `#${issue.number}`
+                  const issueUrl = issue.html_url
+                  
+                  // Buscar referencias en diferentes formatos
+                  const hasReference =
+                    pull.body?.includes(issueRef) ||
+                    pull.title.includes(issueRef) ||
+                    pull.body?.includes(issueUrl) ||
+                    (pull.body && pull.body.includes(`issues/${issue.number}`)) ||
+                    (pull.head && pull.head.ref.includes(`${issue.number}`))
+                  
+                  if (hasReference) {
+                    console.log(`Found linked PR #${pull.number} for issue #${issue.number}:`, {
+                      title: pull.title,
+                      body: pull.body?.substring(0, 100),
+                      head_ref: pull.head?.ref
+                    })
+                  }
+                  return hasReference
+                })
+                
+                linkedPullRequests = issuePulls.map((pull: any) => ({
+                  number: pull.number,
+                  title: pull.title,
+                  html_url: pull.html_url,
+                  state: pull.state
+                }))
+                
+                console.log(`Linked PRs for issue #${issue.number}:`, linkedPullRequests)
+              }
+            } catch (pullError) {
+              console.error(`Error al obtener pull requests para issue ${issue.number}:`, pullError)
+            }
+            
             allIssues.push({
               id: issue.id,
               title: issue.title,
@@ -158,9 +247,11 @@ class GitHubService {
               user: issue.user,
               state: issue.state,
               labels: issue.labels,
-              assignees: issue.assignees || []
+              assignees: issue.assignees || [],
+              linked_branches: linkedBranches.length > 0 ? linkedBranches : undefined,
+              linked_pull_requests: linkedPullRequests.length > 0 ? linkedPullRequests : undefined
             })
-          })
+          }
         } catch (error) {
           console.error(`Error al obtener issues de ${repo.full_name}:`, error)
         }
