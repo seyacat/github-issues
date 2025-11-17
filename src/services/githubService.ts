@@ -183,7 +183,8 @@ class GitHubService {
       for (const repo of reposToProcess) {
         try {
           // Obtener PRs abiertos
-          const pullsResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/pulls?state=open&per_page=100`, {
+          const timestamp = Date.now()
+          const pullsResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/pulls?state=open&per_page=100&_=${timestamp}`, {
             headers: {
               'Authorization': `token ${this.token}`,
               'Accept': 'application/vnd.github.v3+json'
@@ -246,7 +247,8 @@ class GitHubService {
       for (const repo of reposToProcess) {
         try {
           // Obtener todos los issues (abiertos y cerrados)
-          const issuesResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/issues?state=all&per_page=100`, {
+          const timestamp = Date.now()
+          const issuesResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/issues?state=all&per_page=100&_=${timestamp}`, {
             headers: {
               'Authorization': `token ${this.token}`,
               'Accept': 'application/vnd.github.v3+json'
@@ -266,7 +268,8 @@ class GitHubService {
               
               try {
                 // Buscar ramas que sigan el naming convention de GitHub
-                const branchesResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/branches`, {
+                const timestamp = Date.now()
+                const branchesResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/branches?_=${timestamp}`, {
                   headers: {
                     'Authorization': `token ${this.token}`,
                     'Accept': 'application/vnd.github.v3+json'
