@@ -417,7 +417,15 @@ body {
 .repo-header h3 {
   margin: 0;
   font-size: 1.2rem;
+}
+
+.repo-link {
   color: #58a6ff;
+  text-decoration: none;
+}
+
+.repo-link:hover {
+  text-decoration: underline;
 }
 
 .repo-section-category {
@@ -474,6 +482,14 @@ body {
     border-color: #d0d7de;
   }
   .repo-header h3 {
+    color: #0969da;
+  }
+  
+  .repo-link {
+    color: #0969da;
+  }
+  
+  .repo-link:hover {
     color: #0969da;
   }
 }

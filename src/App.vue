@@ -71,7 +71,11 @@
       <div v-else-if="filteredIssues.length > 0 || pullRequestsWithoutIssues.length > 0" class="issues-list">
         <div v-for="repoName in selectedRepos" :key="repoName" class="repo-section">
           <div class="repo-header">
-            <h3>{{ repoName }}</h3>
+            <h3>
+              <a :href="`https://github.com/${repoName}`" target="_blank" class="repo-link">
+                {{ repoName }}
+              </a>
+            </h3>
             <button @click="createIssue(repoName)" class="btn btn-small">
               Create Issue
             </button>
