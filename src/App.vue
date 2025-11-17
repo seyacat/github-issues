@@ -98,7 +98,8 @@
                     <span v-if="issue.labels.length > 0" class="issue-labels">
                       •
                       <span v-for="label in issue.labels" :key="label.name" class="label"
-                            :style="{ backgroundColor: '#' + label.color, color: getLabelTextColor(label.color) }">
+                            :style="{ backgroundColor: '#' + label.color, color: getLabelTextColor(label.color) }"
+                            :title="label.name">
                         {{ label.name }}
                       </span>
                     </span>
@@ -160,7 +161,8 @@
                     <span v-if="issue.labels.length > 0" class="issue-labels">
                       •
                       <span v-for="label in issue.labels" :key="label.name" class="label"
-                            :style="{ backgroundColor: '#' + label.color, color: getLabelTextColor(label.color) }">
+                            :style="{ backgroundColor: '#' + label.color, color: getLabelTextColor(label.color) }"
+                            :title="label.name">
                         {{ label.name }}
                       </span>
                     </span>
