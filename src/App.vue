@@ -90,6 +90,12 @@
                 #{{ issue.number }} •
                 Creado: {{ formatDate(issue.created_at) }} •
                 Por: <a :href="issue.user.html_url" target="_blank" @click.stop>{{ issue.user.login }}</a>
+                <span v-if="issue.assignees.length > 0" class="assignees">
+                  • Asignado a:
+                  <span v-for="assignee in issue.assignees" :key="assignee.login" class="assignee">
+                    <a :href="assignee.html_url" target="_blank" @click.stop>{{ assignee.login }}</a>
+                  </span>
+                </span>
                 <span v-if="issue.labels.length > 0" class="issue-labels">
                   •
                   <span v-for="label in issue.labels" :key="label.name" class="label"
@@ -146,6 +152,11 @@ interface Issue {
   labels: Array<{
     name: string
     color: string
+  }>
+  assignees: Array<{
+    login: string
+    html_url: string
+    avatar_url: string
   }>
 }
 

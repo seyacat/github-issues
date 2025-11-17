@@ -15,6 +15,11 @@ interface GitHubIssue {
     name: string
     color: string
   }>
+  assignees: Array<{
+    login: string
+    html_url: string
+    avatar_url: string
+  }>
 }
 
 interface GitHubUser {
@@ -47,6 +52,11 @@ interface ProcessedIssue {
   labels: Array<{
     name: string
     color: string
+  }>
+  assignees: Array<{
+    login: string
+    html_url: string
+    avatar_url: string
   }>
 }
 
@@ -147,7 +157,8 @@ class GitHubService {
               body: issue.body || '',
               user: issue.user,
               state: issue.state,
-              labels: issue.labels
+              labels: issue.labels,
+              assignees: issue.assignees || []
             })
           })
         } catch (error) {
