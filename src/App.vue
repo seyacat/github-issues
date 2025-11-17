@@ -1,10 +1,10 @@
 <template>
   <div class="container">
-    <h1 class="app-title">Issues en Repositorios de {{ currentUser || 'GitHub' }}</h1>
+    <h1 class="app-title">Issues in Repositories of {{ currentUser ? currentUser.charAt(0).toUpperCase() + currentUser.slice(1) : 'GitHub' }}</h1>
     
     <div v-if="!isAuthenticated" class="auth-section">
-      <h2>Conectar con GitHub</h2>
-      <p>Ingresa tu token de acceso personal de GitHub:</p>
+      <h2>Connect with GitHub</h2>
+      <p>Enter your GitHub personal access token:</p>
       <input
         v-model="tokenInput"
         type="password"
@@ -12,22 +12,30 @@
         class="token-input"
         @keyup.enter="saveToken"
       />
-      <button @click="saveToken" class="btn">Conectar</button>
-      <button @click="createToken" class="btn btn-secondary">Crear Token</button>
+      <button @click="saveToken" class="btn">Connect</button>
+      <button @click="createToken" class="btn btn-secondary">Create Token</button>
       <p style="font-size: 0.9rem; color: #8b949e; margin-top: 1rem;">
-        Necesitas un token con permisos: <code>repo</code> y <code>read:org</code>
+        You need a token with permissions: <code>repo</code> and <code>read:org</code>
       </p>
     </div>
 
     <div v-else>
       <div v-if="repositories.length > 0" class="filters-section">
         <div class="filter-header">
-          <h3>Filtrar por repositorios:</h3>
+          <div class="selected-repos">
+            <div v-for="repo in selectedRepos" :key="repo" class="repo-pill">
+              {{ repo }}
+              <button @click="removeRepo(repo)" class="pill-remove">×</button>
+            </div>
+            <button v-if="selectedRepos.length > 0" @click="clearAllRepos" class="btn btn-secondary btn-small">
+              Clear all
+            </button>
+          </div>
           <div class="dropdown">
             <button @click="toggleDropdown" class="btn btn-secondary">
-              Agregar repositorio ▼
+              Add repository ▼
             </button>
-            <div v-if="showDropdown" class="dropdown-content">
+            <div v-if="showDropdown" class="dropdown-content" @blur="showDropdown = false" tabindex="0">
               <div v-for="repo in repositories" :key="repo.id" class="dropdown-item">
                 <label>
                   <input
@@ -43,22 +51,13 @@
           </div>
         </div>
         
-        <div v-if="selectedRepos.length > 0" class="selected-repos">
-          <div v-for="repo in selectedRepos" :key="repo" class="repo-pill">
-            {{ repo }}
-            <button @click="removeRepo(repo)" class="pill-remove">×</button>
-          </div>
-          <button @click="clearAllRepos" class="btn btn-secondary btn-small">
-            Limpiar todos
-          </button>
-        </div>
       </div>
 
-      <div style="margin-bottom: 2rem; display: flex; gap: 1rem; justify-content: center;">
+      <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
         <button @click="loadIssues" class="btn" :disabled="loading">
-          {{ loading ? 'Cargando...' : 'Cargar Issues' }}
+          {{ loading ? 'Loading...' : 'Load Issues' }}
         </button>
-        <button @click="logout" class="btn btn-secondary">Cerrar Sesión</button>
+        <button @click="logout" class="btn btn-secondary">Logout</button>
       </div>
 
       <div v-if="error" class="error">
@@ -66,7 +65,7 @@
       </div>
 
       <div v-if="loading" class="loading">
-        Cargando issues...
+        Loading issues...
       </div>
 
       <div v-else-if="filteredIssues.length > 0 || pullRequestsWithoutIssues.length > 0" class="issues-list">
@@ -74,13 +73,13 @@
           <div class="repo-header">
             <h3>{{ repoName }}</h3>
             <button @click="createIssue(repoName)" class="btn btn-small">
-              Crear Issue
+              Create Issue
             </button>
           </div>
           
           <!-- Issues Cerradas con PRs Abiertos -->
           <div v-if="getClosedIssuesWithPRsForRepo(repoName).length > 0" class="repo-section-category">
-            <h4>Issues Cerradas con PRs Abiertos ({{ getClosedIssuesWithPRsForRepo(repoName).length }})</h4>
+            <h4>Closed Issues with Open PRs ({{ getClosedIssuesWithPRsForRepo(repoName).length }})</h4>
             <div v-for="issue in getClosedIssuesWithPRsForRepo(repoName)" :key="issue.id" class="issue-item">
               <div class="issue-header" @click="toggleIssue(issue.id)">
                 <div class="issue-main">
@@ -91,10 +90,10 @@
                   </div>
                   <div class="issue-meta">
                     #{{ issue.number }} •
-                    Creado: {{ formatDate(issue.created_at) }} •
-                    Por: <a :href="issue.user.html_url" target="_blank" @click.stop>{{ issue.user.login }}</a>
+                    Created: {{ formatDate(issue.created_at) }} •
+                    By: <a :href="issue.user.html_url" target="_blank" @click.stop>{{ issue.user.login }}</a>
                     <span v-if="issue.assignees.length > 0" class="assignees">
-                      • Asignado a:
+                      • Assigned to:
                       <span v-for="assignee in issue.assignees" :key="assignee.login" class="assignee">
                         <a :href="assignee.html_url" target="_blank" @click.stop>{{ assignee.login }}</a>
                       </span>
@@ -115,7 +114,7 @@
               </div>
               <div v-if="(issue.linked_branches && issue.linked_branches.length > 0) || (issue.linked_pull_requests && issue.linked_pull_requests.length > 0)" class="issue-links">
                 <div v-if="issue.linked_branches && issue.linked_branches.length > 0" class="issue-branches">
-                  <span class="branches-label">Ramas:</span>
+                  <span class="branches-label">Branches:</span>
                   <span v-for="branch in issue.linked_branches" :key="branch.name" class="branch">
                     <a :href="branch.url" target="_blank" @click.stop>{{ branch.name }}</a>
                   </span>
@@ -135,7 +134,7 @@
 
           <!-- Issues Abiertas -->
           <div v-if="getOpenIssuesForRepo(repoName).length > 0" class="repo-section-category">
-            <h4>Issues Abiertas ({{ getOpenIssuesForRepo(repoName).length }})</h4>
+            <h4>Open Issues ({{ getOpenIssuesForRepo(repoName).length }})</h4>
             <div v-for="issue in getOpenIssuesForRepo(repoName)" :key="issue.id" class="issue-item">
               <div class="issue-header" @click="toggleIssue(issue.id)">
                 <div class="issue-main">
@@ -146,10 +145,10 @@
                   </div>
                   <div class="issue-meta">
                     #{{ issue.number }} •
-                    Creado: {{ formatDate(issue.created_at) }} •
-                    Por: <a :href="issue.user.html_url" target="_blank" @click.stop>{{ issue.user.login }}</a>
+                    Created: {{ formatDate(issue.created_at) }} •
+                    By: <a :href="issue.user.html_url" target="_blank" @click.stop>{{ issue.user.login }}</a>
                     <span v-if="issue.assignees.length > 0" class="assignees">
-                      • Asignado a:
+                      • Assigned to:
                       <span v-for="assignee in issue.assignees" :key="assignee.login" class="assignee">
                         <a :href="assignee.html_url" target="_blank" @click.stop>{{ assignee.login }}</a>
                       </span>
@@ -170,7 +169,7 @@
               </div>
               <div v-if="(issue.linked_branches && issue.linked_branches.length > 0) || (issue.linked_pull_requests && issue.linked_pull_requests.length > 0)" class="issue-links">
                 <div v-if="issue.linked_branches && issue.linked_branches.length > 0" class="issue-branches">
-                  <span class="branches-label">Ramas:</span>
+                  <span class="branches-label">Branches:</span>
                   <span v-for="branch in issue.linked_branches" :key="branch.name" class="branch">
                     <a :href="branch.url" target="_blank" @click.stop>{{ branch.name }}</a>
                   </span>
@@ -190,7 +189,7 @@
 
           <!-- PRs sin Issues -->
           <div v-if="getPRsWithoutIssuesForRepo(repoName).length > 0" class="repo-section-category">
-            <h4>PRs sin Issues Vinculadas ({{ getPRsWithoutIssuesForRepo(repoName).length }})</h4>
+            <h4>PRs without Linked Issues ({{ getPRsWithoutIssuesForRepo(repoName).length }})</h4>
             <div v-for="pr in getPRsWithoutIssuesForRepo(repoName)" :key="pr.id" class="issue-item">
               <div class="issue-header">
                 <div class="issue-main">
@@ -201,8 +200,8 @@
                   </div>
                   <div class="issue-meta">
                     PR #{{ pr.number }} •
-                    Creado: {{ formatDate(pr.created_at) }} •
-                    Por: <a :href="pr.user.html_url" target="_blank">{{ pr.user.login }}</a>
+                    Created: {{ formatDate(pr.created_at) }} •
+                    By: <a :href="pr.user.html_url" target="_blank">{{ pr.user.login }}</a>
                   </div>
                 </div>
               </div>
@@ -212,10 +211,10 @@
       </div>
 
       <div v-else-if="!loading && filteredIssues.length === 0 && selectedRepos.length > 0">
-        <p>No se encontraron issues abiertos en los repositorios seleccionados.</p>
+        <p>No open issues found in the selected repositories.</p>
       </div>
       <div v-else-if="!loading && selectedRepos.length === 0">
-        <p>Selecciona repositorios para ver los issues.</p>
+        <p>Select repositories to view issues.</p>
       </div>
     </div>
 
@@ -223,7 +222,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { githubService } from './services/githubService'
 
 interface Repository {
@@ -309,7 +308,7 @@ const saveToken = async () => {
       repositories.value = userRepos
       loadSelectedRepos()
     } catch (err) {
-      console.error('Error al obtener usuario o repositorios:', err)
+      console.error('Error getting user or repositories:', err)
       currentUser.value = ''
     }
     isAuthenticated.value = true
@@ -329,7 +328,7 @@ const logout = () => {
 
 const loadIssues = async () => {
   if (selectedRepos.value.length === 0) {
-    error.value = 'Debes seleccionar al menos un repositorio para cargar issues'
+    error.value = 'You must select at least one repository to load issues'
     return
   }
 
@@ -346,7 +345,7 @@ const loadIssues = async () => {
     filteredIssues.value = data.issues
     pullRequestsWithoutIssues.value = data.pullRequestsWithoutIssues
   } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Error al cargar issues'
+    error.value = err instanceof Error ? err.message : 'Error loading issues'
     console.error('Error loading issues:', err)
   } finally {
     loading.value = false
@@ -359,6 +358,22 @@ const createToken = () => {
 
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
+  if (showDropdown.value) {
+    // Agregar event listener para cerrar el dropdown al hacer click fuera
+    setTimeout(() => {
+      document.addEventListener('click', closeDropdownOnOutsideClick)
+    }, 0)
+  } else {
+    document.removeEventListener('click', closeDropdownOnOutsideClick)
+  }
+}
+
+const closeDropdownOnOutsideClick = (event: MouseEvent) => {
+  const dropdown = document.querySelector('.dropdown')
+  if (dropdown && !dropdown.contains(event.target as Node)) {
+    showDropdown.value = false
+    document.removeEventListener('click', closeDropdownOnOutsideClick)
+  }
 }
 
 const toggleIssue = (issueId: number) => {
@@ -512,7 +527,7 @@ const getLabelTextColor = (backgroundColor: string) => {
 }
 
 const renderMarkdown = (text: string) => {
-  if (!text) return '<p>No hay descripción disponible</p>'
+  if (!text) return '<p>No description available</p>'
   
   return text
     .replace(/\n/g, '<br>')
@@ -524,7 +539,7 @@ const renderMarkdown = (text: string) => {
 }
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('es-ES')
+  return new Date(dateString).toLocaleDateString('en-US')
 }
 
 
@@ -544,8 +559,13 @@ onMounted(async () => {
         await loadIssues()
       }
     } catch (err) {
-      console.error('Error al obtener usuario o repositorios:', err)
+      console.error('Error getting user or repositories:', err)
     }
   }
+})
+
+// Cleanup event listener cuando el componente se desmonte
+onUnmounted(() => {
+  document.removeEventListener('click', closeDropdownOnOutsideClick)
 })
 </script>

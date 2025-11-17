@@ -229,7 +229,7 @@ class GitHubService {
                   })
                   console.log(`Linked PR #${pull.number} to issue #${issueNumber} in ${repo.full_name}`)
                 } else {
-                  // PR sin issue vinculado
+                  // PR without linked issue
                   pullRequestsWithoutIssues.push(processedPR)
                   console.log(`PR #${pull.number} has no linked issue:`, pull.title)
                 }
@@ -239,7 +239,29 @@ class GitHubService {
             }
           }
         } catch (pullError) {
-          console.error(`Error al obtener PRs de ${repo.full_name}:`, pullError)
+          console.error(`Error getting PRs from ${repo.full_name}:`, pullError)
+        }
+      }
+
+      // Obtener todas las ramas por repositorio primero (una sola llamada por repo)
+      const repoBranchesMap = new Map<string, any[]>()
+      for (const repo of reposToProcess) {
+        try {
+          const timestamp = Date.now()
+          const branchesResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/branches?_=${timestamp}`, {
+            headers: {
+              'Authorization': `token ${this.token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          })
+          
+          if (branchesResponse.ok) {
+            const branches = await branchesResponse.json()
+            repoBranchesMap.set(repo.full_name, branches)
+          }
+        } catch (branchError) {
+          console.error(`Error getting branches from ${repo.full_name}:`, branchError)
+          repoBranchesMap.set(repo.full_name, [])
         }
       }
 
@@ -258,40 +280,22 @@ class GitHubService {
           if (issuesResponse.ok) {
             const issues = await issuesResponse.json()
             const regularIssues = issues.filter((issue: any) => !issue.pull_request)
+            const repoBranches = repoBranchesMap.get(repo.full_name) || []
             
             for (const issue of regularIssues) {
               const issueKey = `${repo.full_name}#${issue.number}`
               const linkedPullRequests = prToIssueMap.get(issueKey) || []
               
-              // Obtener las ramas vinculadas al issue
-              let linkedBranches: Array<{ name: string; url: string }> = []
+              // Buscar ramas vinculadas al issue en las ramas ya obtenidas
+              const issueBranches = repoBranches.filter((branch: any) =>
+                branch.name.startsWith(`issue-${issue.number}-`) ||
+                branch.name.startsWith(`${issue.number}-`)
+              )
               
-              try {
-                // Buscar ramas que sigan el naming convention de GitHub
-                const timestamp = Date.now()
-                const branchesResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/branches?_=${timestamp}`, {
-                  headers: {
-                    'Authorization': `token ${this.token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                  }
-                })
-                
-                if (branchesResponse.ok) {
-                  const branches = await branchesResponse.json()
-                  // Filtrar ramas que sigan el patrón issue-{number}
-                  const issueBranches = branches.filter((branch: any) =>
-                    branch.name.startsWith(`issue-${issue.number}-`) ||
-                    branch.name.startsWith(`${issue.number}-`)
-                  )
-                  
-                  linkedBranches = issueBranches.map((branch: any) => ({
-                    name: branch.name,
-                    url: `https://github.com/${repo.full_name}/tree/${branch.name}`
-                  }))
-                }
-              } catch (branchError) {
-                console.error(`Error al obtener ramas para issue ${issue.number}:`, branchError)
-              }
+              const linkedBranches = issueBranches.map((branch: any) => ({
+                name: branch.name,
+                url: `https://github.com/${repo.full_name}/tree/${branch.name}`
+              }))
               
               // Incluir todas las issues abiertas, y las cerradas solo si tienen PRs o ramas
               if (issue.state === 'open' || linkedPullRequests.length > 0 || linkedBranches.length > 0) {
@@ -314,7 +318,7 @@ class GitHubService {
             }
           }
         } catch (error) {
-          console.error(`Error al obtener issues de ${repo.full_name}:`, error)
+          console.error(`Error getting issues from ${repo.full_name}:`, error)
         }
       }
 
@@ -334,7 +338,7 @@ class GitHubService {
         )
       }
     } catch (error) {
-      console.error('Error al obtener issues:', error)
+      console.error('Error getting issues:', error)
       throw error
     }
   }
