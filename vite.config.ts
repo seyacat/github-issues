@@ -31,7 +31,7 @@ export default defineConfig({
     })
   ],
   server: {
-    port: 3000
+    port: 6060
   },
   base: process.env.NODE_ENV === 'production' ? '/github-issues/' : '/',
   build: {

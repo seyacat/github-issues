@@ -22,30 +22,34 @@
     <div v-else>
       <div v-if="repositories.length > 0" class="filters-section">
         <div class="filter-header">
-          <div class="selected-repos">
-            <div v-for="repo in selectedRepos" :key="repo" class="repo-pill">
-              {{ repo }}
-              <button @click="removeRepo(repo)" class="pill-remove">×</button>
+          <div class="selected-repos-container">
+            <div class="selected-repos">
+              <div v-for="repo in selectedRepos" :key="repo" class="repo-pill">
+                {{ repo }}
+                <button @click="removeRepo(repo)" class="pill-remove">×</button>
+              </div>
+              <button v-if="selectedRepos.length > 0" @click="clearAllRepos" class="btn btn-secondary btn-small">
+                Clear all
+              </button>
             </div>
-            <button v-if="selectedRepos.length > 0" @click="clearAllRepos" class="btn btn-secondary btn-small">
-              Clear all
-            </button>
           </div>
-          <div class="dropdown">
-            <button @click="toggleDropdown" class="btn btn-secondary">
-              Add repository ▼
-            </button>
-            <div v-if="showDropdown" class="dropdown-content" @blur="showDropdown = false" tabindex="0">
-              <div v-for="repo in repositories" :key="repo.id" class="dropdown-item">
-                <label>
-                  <input
-                    type="checkbox"
-                    :value="repo.full_name"
-                    v-model="selectedRepos"
-                    @change="saveSelectedRepos"
-                  />
-                  {{ repo.full_name }}
-                </label>
+          <div class="dropdown-container">
+            <div class="dropdown">
+              <button @click="toggleDropdown" class="btn btn-secondary">
+                Add repository ▼
+              </button>
+              <div v-if="showDropdown" class="dropdown-content" @blur="showDropdown = false" tabindex="0">
+                <div v-for="repo in repositories" :key="repo.id" class="dropdown-item">
+                  <label>
+                    <input
+                      type="checkbox"
+                      :value="repo.full_name"
+                      v-model="selectedRepos"
+                      @change="saveSelectedRepos"
+                    />
+                    {{ repo.full_name }}
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -222,12 +226,18 @@
       </div>
     </div>
 
+    <!-- Footer with version info -->
+    <footer class="app-footer">
+      <p>GitHub Issues PWA v{{ appVersion }}</p>
+    </footer>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { githubService } from './services/githubService'
+import packageJson from '../package.json'
 
 interface Repository {
   id: number
@@ -300,6 +310,7 @@ const repositories = ref<Repository[]>([])
 const selectedRepos = ref<string[]>([])
 const showDropdown = ref(false)
 const filteredIssues = ref<Issue[]>([])
+const appVersion = ref(packageJson.version)
 
 const saveToken = async () => {
   if (tokenInput.value.trim()) {

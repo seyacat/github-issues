@@ -311,11 +311,31 @@ body {
 }
 
 .filter-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 1rem;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
+}
+
+.selected-repos-container {
+  min-width: 0;
+}
+
+.dropdown-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .filter-header {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .dropdown-container {
+    justify-content: flex-end;
+  }
 }
 
 
@@ -336,6 +356,13 @@ body {
   min-width: 250px;
   right: 0;
   margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .dropdown-content {
+    right: auto;
+    left: 0;
+  }
 }
 
 .dropdown-item {
@@ -360,6 +387,7 @@ body {
   flex-wrap: wrap;
   gap: 0.5rem;
   align-items: center;
+  min-height: 2.5rem;
 }
 
 .repo-pill {
@@ -626,5 +654,21 @@ body {
   .modal-close:hover {
     color: #1f2328;
     background: #f6f8fa;
+  }
+}
+/* Footer Styles */
+.app-footer {
+  margin-top: 3rem;
+  padding: 1rem;
+  text-align: center;
+  color: #8b949e;
+  font-size: 0.9rem;
+  border-top: 1px solid #444c56;
+}
+
+@media (prefers-color-scheme: light) {
+  .app-footer {
+    color: #656d76;
+    border-top-color: #d0d7de;
   }
 }
