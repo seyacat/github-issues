@@ -169,22 +169,29 @@ body {
 }
 
 .issue-main {
-  cursor: pointer;
   flex: 1;
   position: relative;
-  padding-right: 2rem;
+  padding-right: 1rem;
 }
 
-.issue-main:hover {
-  opacity: 0.8;
-}
-
-.expand-icon {
-  position: absolute;
-  right: 0;
-  top: 0;
-  font-size: 0.8rem;
+.expand-btn {
+  background: none;
+  border: 1px solid #444c56;
   color: #8b949e;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  min-width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.expand-btn:hover {
+  background: #3c444d;
+  border-color: #8b949e;
 }
 
 .issue-meta {

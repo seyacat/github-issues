@@ -94,7 +94,7 @@
           <div v-if="getClosedIssuesWithPRsForRepo(repoName).length > 0" class="repo-section-category">
             <h4>Closed Issues with Open PRs ({{ getClosedIssuesWithPRsForRepo(repoName).length }})</h4>
             <div v-for="issue in getClosedIssuesWithPRsForRepo(repoName)" :key="issue.id" class="issue-item">
-              <div class="issue-header" @click="toggleIssue(issue.id)">
+              <div class="issue-header">
                 <div class="issue-main">
                   <div class="issue-title">
                     <a :href="issue.html_url" target="_blank" class="issue-link" @click.stop>
@@ -121,9 +121,9 @@
                     </span>
                   </div>
                 </div>
-                <div class="expand-icon">
+                <button @click="toggleIssue(issue.id)" class="expand-btn" :title="expandedIssues[issue.id] ? 'Collapse' : 'Expand'">
                   {{ expandedIssues[issue.id] ? '▼' : '▶' }}
-                </div>
+                </button>
               </div>
               <div v-if="(issue.linked_branches && issue.linked_branches.length > 0) || (issue.linked_pull_requests && issue.linked_pull_requests.length > 0)" class="issue-links">
                 <div v-if="issue.linked_branches && issue.linked_branches.length > 0" class="issue-branches">
@@ -149,7 +149,7 @@
           <div v-if="getOpenIssuesForRepo(repoName).length > 0" class="repo-section-category">
             <h4>Open Issues ({{ getOpenIssuesForRepo(repoName).length }})</h4>
             <div v-for="issue in getOpenIssuesForRepo(repoName)" :key="issue.id" class="issue-item">
-              <div class="issue-header" @click="toggleIssue(issue.id)">
+              <div class="issue-header">
                 <div class="issue-main">
                   <div class="issue-title">
                     <a :href="issue.html_url" target="_blank" class="issue-link" @click.stop>
@@ -176,9 +176,9 @@
                     </span>
                   </div>
                 </div>
-                <div class="expand-icon">
+                <button @click="toggleIssue(issue.id)" class="expand-btn" :title="expandedIssues[issue.id] ? 'Collapse' : 'Expand'">
                   {{ expandedIssues[issue.id] ? '▼' : '▶' }}
-                </div>
+                </button>
               </div>
               <div v-if="(issue.linked_branches && issue.linked_branches.length > 0) || (issue.linked_pull_requests && issue.linked_pull_requests.length > 0)" class="issue-links">
                 <div v-if="issue.linked_branches && issue.linked_branches.length > 0" class="issue-branches">

@@ -35,6 +35,6 @@ export default defineConfig({
   },
   base: process.env.NODE_ENV === 'production' ? '/github-issues/' : '/',
   build: {
-    outDir: 'docs'
+    outDir: 'dist'
   }
 })
