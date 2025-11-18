@@ -30,11 +30,46 @@ body {
   text-align: center;
 }
 
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
 .app-title {
   font-size: 1.4rem;
   font-weight: 600;
-  margin-bottom: 1rem;
   color: #f0f6fc;
+  margin: 0;
+}
+
+.install-btn {
+  background: #58a6ff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.install-btn:hover {
+  background: #4493f1;
+}
+
+@media (max-width: 768px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .install-btn {
+    align-self: flex-end;
+  }
 }
 
 .container {

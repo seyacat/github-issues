@@ -1,6 +1,11 @@
 <template>
   <div class="container">
-    <h1 class="app-title">Issues in Repositories of {{ currentUser ? currentUser.charAt(0).toUpperCase() + currentUser.slice(1) : 'GitHub' }}</h1>
+    <div class="header-section">
+      <h1 class="app-title">Issues in Repositories of {{ currentUser ? currentUser.charAt(0).toUpperCase() + currentUser.slice(1) : 'GitHub' }}</h1>
+      <button v-if="showInstallButton" @click="installApp" class="install-btn" title="Install App">
+        📱 Install
+      </button>
+    </div>
     
     <div v-if="!isAuthenticated" class="auth-section">
       <h2>Connect with GitHub</h2>
@@ -311,6 +316,8 @@ const selectedRepos = ref<string[]>([])
 const showDropdown = ref(false)
 const filteredIssues = ref<Issue[]>([])
 const appVersion = ref(packageJson.version)
+const showInstallButton = ref(false)
+const deferredPrompt = ref<any>(null)
 
 const saveToken = async () => {
   if (tokenInput.value.trim()) {
@@ -558,7 +565,30 @@ const formatDate = (dateString: string) => {
 }
 
 
+// PWA Install functionality
+const installApp = async () => {
+  if (deferredPrompt.value) {
+    deferredPrompt.value.prompt()
+    const { outcome } = await deferredPrompt.value.userChoice
+    if (outcome === 'accepted') {
+      console.log('PWA installed successfully')
+      showInstallButton.value = false
+    }
+    deferredPrompt.value = null
+  }
+}
+
+// Listen for beforeinstallprompt event
+const handleBeforeInstallPrompt = (e: Event) => {
+  e.preventDefault()
+  deferredPrompt.value = e
+  showInstallButton.value = true
+}
+
 onMounted(async () => {
+  // Add PWA install event listener
+  window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+  
   if (githubService.hasToken()) {
     isAuthenticated.value = true
     try {
@@ -579,8 +609,9 @@ onMounted(async () => {
   }
 })
 
-// Cleanup event listener cuando el componente se desmonte
+// Cleanup event listeners cuando el componente se desmonte
 onUnmounted(() => {
   document.removeEventListener('click', closeDropdownOnOutsideClick)
+  window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 })
 </script>
