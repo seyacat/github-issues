@@ -308,30 +308,6 @@ class GitHubService {
                 url: `https://github.com/${repo.full_name}/tree/${branch.name}`
               }))
               
-              // Obtener comentarios del issue
-              let comments = []
-              try {
-                const commentsResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/issues/${issue.number}/comments?_=${timestamp}`, {
-                  headers: {
-                    'Authorization': `token ${this.token}`,
-                    'Accept': 'application/vnd.github.v3+json'
-                  }
-                })
-                
-                if (commentsResponse.ok) {
-                  const commentsData = await commentsResponse.json()
-                  comments = commentsData.map((comment: any) => ({
-                    id: comment.id,
-                    user: comment.user,
-                    body: comment.body,
-                    created_at: comment.created_at,
-                    html_url: comment.html_url
-                  }))
-                }
-              } catch (commentError) {
-                console.error(`Error getting comments for issue ${issue.number} in ${repo.full_name}:`, commentError)
-              }
-              
               // Incluir todas las issues abiertas, y las cerradas solo si tienen PRs o ramas
               if (issue.state === 'open' || linkedPullRequests.length > 0 || linkedBranches.length > 0) {
                 allIssues.push({
@@ -347,8 +323,8 @@ class GitHubService {
                   labels: issue.labels,
                   assignees: issue.assignees || [],
                   linked_branches: linkedBranches.length > 0 ? linkedBranches : undefined,
-                  linked_pull_requests: linkedPullRequests.length > 0 ? linkedPullRequests : undefined,
-                  comments: comments.length > 0 ? comments : undefined
+                  linked_pull_requests: linkedPullRequests.length > 0 ? linkedPullRequests : undefined
+                  // Comments will be loaded on demand when issue is expanded
                 })
               }
             }
@@ -401,6 +377,37 @@ class GitHubService {
     }
     
     return null
+  }
+
+  async getIssueComments(repoFullName: string, issueNumber: number): Promise<any[]> {
+    if (!this.token) {
+      throw new Error('Token de GitHub no configurado')
+    }
+
+    try {
+      const timestamp = Date.now()
+      const commentsResponse = await fetch(`https://api.github.com/repos/${repoFullName}/issues/${issueNumber}/comments?_=${timestamp}`, {
+        headers: {
+          'Authorization': `token ${this.token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      })
+      
+      if (commentsResponse.ok) {
+        const commentsData = await commentsResponse.json()
+        return commentsData.map((comment: any) => ({
+          id: comment.id,
+          user: comment.user,
+          body: comment.body,
+          created_at: comment.created_at,
+          html_url: comment.html_url
+        }))
+      }
+      return []
+    } catch (error) {
+      console.error(`Error getting comments for issue ${issueNumber} in ${repoFullName}:`, error)
+      throw error
+    }
   }
 }
 

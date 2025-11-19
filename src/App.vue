@@ -143,16 +143,33 @@
                 <div class="issue-body" v-html="renderMarkdown(issue.body)"></div>
                 
                 <!-- Comments Section -->
-                <div v-if="issue.comments && issue.comments.length > 0" class="comments-section">
-                  <h5 class="comments-title">Comments ({{ issue.comments.length }})</h5>
-                  <div v-for="comment in issue.comments" :key="comment.id" class="comment">
-                    <div class="comment-header">
-                      <a :href="comment.user.html_url" target="_blank" class="comment-user">
-                        {{ comment.user.login }}
-                      </a>
-                      <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                <div v-if="issue.comments || loadingComments[issue.id]" class="comments-section">
+                  <h5 class="comments-title">
+                    Comments
+                    <span v-if="issue.comments">({{ issue.comments.length }})</span>
+                  </h5>
+                  
+                  <!-- Loading State -->
+                  <div v-if="loadingComments[issue.id]" class="comments-loading">
+                    Loading comments...
+                  </div>
+                  
+                  <!-- Comments List -->
+                  <div v-else-if="issue.comments && issue.comments.length > 0">
+                    <div v-for="comment in issue.comments" :key="comment.id" class="comment">
+                      <div class="comment-header">
+                        <a :href="comment.user.html_url" target="_blank" class="comment-user">
+                          {{ comment.user.login }}
+                        </a>
+                        <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                      </div>
+                      <div class="comment-body" v-html="renderMarkdown(comment.body)"></div>
                     </div>
-                    <div class="comment-body" v-html="renderMarkdown(comment.body)"></div>
+                  </div>
+                  
+                  <!-- No Comments -->
+                  <div v-else-if="issue.comments && issue.comments.length === 0" class="no-comments">
+                    No comments yet.
                   </div>
                 </div>
               </div>
@@ -212,16 +229,33 @@
                 <div class="issue-body" v-html="renderMarkdown(issue.body)"></div>
                 
                 <!-- Comments Section -->
-                <div v-if="issue.comments && issue.comments.length > 0" class="comments-section">
-                  <h5 class="comments-title">Comments ({{ issue.comments.length }})</h5>
-                  <div v-for="comment in issue.comments" :key="comment.id" class="comment">
-                    <div class="comment-header">
-                      <a :href="comment.user.html_url" target="_blank" class="comment-user">
-                        {{ comment.user.login }}
-                      </a>
-                      <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                <div v-if="issue.comments || loadingComments[issue.id]" class="comments-section">
+                  <h5 class="comments-title">
+                    Comments
+                    <span v-if="issue.comments">({{ issue.comments.length }})</span>
+                  </h5>
+                  
+                  <!-- Loading State -->
+                  <div v-if="loadingComments[issue.id]" class="comments-loading">
+                    Loading comments...
+                  </div>
+                  
+                  <!-- Comments List -->
+                  <div v-else-if="issue.comments && issue.comments.length > 0">
+                    <div v-for="comment in issue.comments" :key="comment.id" class="comment">
+                      <div class="comment-header">
+                        <a :href="comment.user.html_url" target="_blank" class="comment-user">
+                          {{ comment.user.login }}
+                        </a>
+                        <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                      </div>
+                      <div class="comment-body" v-html="renderMarkdown(comment.body)"></div>
                     </div>
-                    <div class="comment-body" v-html="renderMarkdown(comment.body)"></div>
+                  </div>
+                  
+                  <!-- No Comments -->
+                  <div v-else-if="issue.comments && issue.comments.length === 0" class="no-comments">
+                    No comments yet.
                   </div>
                 </div>
               </div>
@@ -357,6 +391,7 @@ const filteredIssues = ref<Issue[]>([])
 const appVersion = ref(packageJson.version)
 const showInstallButton = ref(false)
 const deferredPrompt = ref<any>(null)
+const loadingComments = ref<Record<number, boolean>>({})
 
 const saveToken = async () => {
   if (tokenInput.value.trim()) {
@@ -437,8 +472,25 @@ const closeDropdownOnOutsideClick = (event: MouseEvent) => {
   }
 }
 
-const toggleIssue = (issueId: number) => {
-  expandedIssues.value[issueId] = !expandedIssues.value[issueId]
+const toggleIssue = async (issueId: number) => {
+  const issue = filteredIssues.value.find(i => i.id === issueId)
+  if (!issue) return
+  
+  const isExpanding = !expandedIssues.value[issueId]
+  expandedIssues.value[issueId] = isExpanding
+  
+  // Load comments only when expanding and if not already loaded
+  if (isExpanding && !issue.comments) {
+    loadingComments.value[issueId] = true
+    try {
+      const comments = await githubService.getIssueComments(issue.repository, issue.number)
+      issue.comments = comments
+    } catch (error) {
+      console.error('Error loading comments:', error)
+    } finally {
+      loadingComments.value[issueId] = false
+    }
+  }
 }
 
 const loadSelectedRepos = () => {

@@ -712,6 +712,20 @@ body {
   margin: 0 0 1rem 0;
 }
 
+.comments-loading {
+  text-align: center;
+  color: #8b949e;
+  font-style: italic;
+  padding: 1rem;
+}
+
+.no-comments {
+  text-align: center;
+  color: #8b949e;
+  font-style: italic;
+  padding: 1rem;
+}
+
 .comment {
   background: #22272e;
   border: 1px solid #444c56;
