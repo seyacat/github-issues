@@ -35,11 +35,11 @@ jobs:
       - name: Verify build output
         run: |
           echo "Build output contents:"
-          ls -la docs/
+          ls -la dist/
           echo "Checking for index.html:"
-          ls -la docs/index.html || echo "index.html not found!"
+          ls -la dist/index.html || echo "index.html not found!"
           echo "Checking for assets:"
-          ls -la docs/assets/ || echo "assets directory not found!"
+          ls -la dist/assets/ || echo "assets directory not found!"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -47,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./docs
+          path: ./dist
 
   deploy:
     environment:

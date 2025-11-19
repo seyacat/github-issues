@@ -141,6 +141,20 @@
               </div>
               <div v-if="expandedIssues[issue.id]" class="issue-content">
                 <div class="issue-body" v-html="renderMarkdown(issue.body)"></div>
+                
+                <!-- Comments Section -->
+                <div v-if="issue.comments && issue.comments.length > 0" class="comments-section">
+                  <h5 class="comments-title">Comments ({{ issue.comments.length }})</h5>
+                  <div v-for="comment in issue.comments" :key="comment.id" class="comment">
+                    <div class="comment-header">
+                      <a :href="comment.user.html_url" target="_blank" class="comment-user">
+                        {{ comment.user.login }}
+                      </a>
+                      <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                    </div>
+                    <div class="comment-body" v-html="renderMarkdown(comment.body)"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -196,6 +210,20 @@
               </div>
               <div v-if="expandedIssues[issue.id]" class="issue-content">
                 <div class="issue-body" v-html="renderMarkdown(issue.body)"></div>
+                
+                <!-- Comments Section -->
+                <div v-if="issue.comments && issue.comments.length > 0" class="comments-section">
+                  <h5 class="comments-title">Comments ({{ issue.comments.length }})</h5>
+                  <div v-for="comment in issue.comments" :key="comment.id" class="comment">
+                    <div class="comment-header">
+                      <a :href="comment.user.html_url" target="_blank" class="comment-user">
+                        {{ comment.user.login }}
+                      </a>
+                      <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+                    </div>
+                    <div class="comment-body" v-html="renderMarkdown(comment.body)"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -282,6 +310,17 @@ interface Issue {
     title: string
     html_url: string
     state: string
+  }>
+  comments?: Array<{
+    id: number
+    user: {
+      login: string
+      html_url: string
+      avatar_url: string
+    }
+    body: string
+    created_at: string
+    html_url: string
   }>
 }
 

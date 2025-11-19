@@ -698,6 +698,78 @@ body {
     background: #f6f8fa;
   }
 }
+/* Comments Section Styles */
+.comments-section {
+  margin-top: 1.5rem;
+  border-top: 1px solid #444c56;
+  padding-top: 1rem;
+}
+
+.comments-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #8b949e;
+  margin: 0 0 1rem 0;
+}
+
+.comment {
+  background: #22272e;
+  border: 1px solid #444c56;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.comment:last-child {
+  margin-bottom: 0;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.comment-user {
+  color: #58a6ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.comment-user:hover {
+  text-decoration: underline;
+}
+
+.comment-date {
+  color: #8b949e;
+  font-size: 0.8rem;
+}
+
+.comment-body {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #f0f6fc;
+}
+
+.comment-body code {
+  background: #2d333b;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.85em;
+}
+
+.comment-body a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.comment-body a:hover {
+  text-decoration: underline;
+}
+
 /* Footer Styles */
 .app-footer {
   margin-top: 3rem;
@@ -712,5 +784,23 @@ body {
   .app-footer {
     color: #656d76;
     border-top-color: #d0d7de;
+  }
+  
+  .comments-section {
+    border-top-color: #d0d7de;
+  }
+  
+  .comment {
+    background: #f6f8fa;
+    border-color: #d0d7de;
+  }
+  
+  .comment-body {
+    color: #1f2328;
+  }
+  
+  .comment-body code {
+    background: #ffffff;
+    border: 1px solid #d0d7de;
   }
 }

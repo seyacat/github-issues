@@ -15,16 +15,40 @@ export default defineConfig({
         short_name: 'GitHubIssues',
         description: 'PWA para listar issues de GitHub',
         theme_color: '#24292e',
+        background_color: '#24292e',
+        display: 'standalone',
+        start_url: '/',
         icons: [
           {
-            src: 'images/icon.ico',
+            src: 'images/pwa-icons/favicon-32.png',
             sizes: '32x32',
-            type: 'image/x-icon'
+            type: 'image/png'
           },
           {
-            src: 'images/logo.jpg',
+            src: 'images/pwa-icons/favicon-16.png',
+            sizes: '16x16',
+            type: 'image/png'
+          },
+          {
+            src: 'images/pwa-icons/icon-192.png',
             sizes: '192x192',
-            type: 'image/jpeg'
+            type: 'image/png'
+          },
+          {
+            src: 'images/pwa-icons/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: 'images/pwa-icons/maskable-icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          },
+          {
+            src: 'images/pwa-icons/apple-touch-icon-180.png',
+            sizes: '180x180',
+            type: 'image/png'
           }
         ]
       }
